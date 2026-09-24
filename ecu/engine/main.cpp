@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "Engine.hpp"
+
 /**
  * @brief Entry point of the engine ECU simulation.
  * 
@@ -8,7 +10,12 @@
 
  int main()
  {
-    std::cout << "Engine ECU started." << std::endl;
+   Engine engine;
+
+   engine.start();
+
+   std::cout << "Engine ECU started." << std::endl;
+   std::cout << "Engine RPM: " << engine.getRPM() << std::endl;
 
     return 0;
  }

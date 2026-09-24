@@ -1,0 +1,45 @@
+#pragma once
+
+/**
+ * @brief Represents the simulated engine state.
+ * 
+ * The Engine class stores and updates the main parameters
+ * of the simulated automotive engine.
+ */
+
+ class Engine
+ {
+public:
+    /**
+     * @brief Creates an engine in the stopped state.
+     */
+    Engine();
+
+    /**
+     * @brief Starts the engine.
+     */
+    void start();
+
+    /**
+     * @brief Stops the engine.
+     */
+    void stop();
+
+    /**
+     * @brief Checks wether the engine is running.
+     * 
+     * @return True if the engine is running, false otherwise.
+     */
+    bool isRunning() const;
+
+    /**
+     * @brief Gets the current engine speed in RPM.
+     * 
+     * @return The current engine speed in revolutions per minute.
+     */
+    double getRPM() const;
+
+private:
+    bool running_;
+    double rpm_;
+ };
