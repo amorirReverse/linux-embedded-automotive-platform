@@ -47,7 +47,7 @@ void BatteryEcu::run(int cycleCount)
                   << " | Current: "
                   << battery_.getCurrent()
                   << " A" 
-                  << "| State of Charge: "
+                  << " | State of Charge: "
                   << battery_.getStateOfCharge()
                   << " %"
                   << std::endl;
