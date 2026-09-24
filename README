@@ -9,7 +9,7 @@ Early development.
 
 Current milestone
 -----------------
-V0.1 - Project architecture and initial engine ECU.
+V0.2 - CAN communication and Engine ECU integration
 
 Technologies
 ------------
@@ -22,15 +22,24 @@ Technologies
 - systemd
 - Yocto Project (planned)
 
-Roadmap
--------
+## Project Status
+
+### V0.1 — Initial ECU Simulation
+
 - [x] Project structure
 - [x] Engine ECU
 - [x] Engine simulation
-- [x] CAN communication
+
+### V0.2 — CAN Communication
+
+- [x] SocketCAN integration
+- [x] Virtual CAN interface (`vcan0`)
+- [x] CAN socket abstraction
+- [x] C++ CAN frame transmission
+- [ ] Engine ECU CAN integration
+
+### V0.3 — Multi-ECU Platform
+
 - [ ] Multiple ECUs
 - [ ] Gateway
 - [ ] Unit tests
-- [ ] systemd services
-- [ ] Watchdog
-- [ ] Yocto Linux image
