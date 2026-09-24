@@ -1,13 +1,16 @@
 // ecu/battery/BatteryEcu.cpp
 
 #include "BatteryEcu.hpp"
+#include "BatteryCanMessage.hpp"
 
 #include <chrono>
+#include <cstdint>
 #include <iostream>
 #include <thread>
 
-BatteryEcu::BatteryEcu()
-    : battery_()
+BatteryEcu::BatteryEcu(const char* canInterface)
+    : canSocket_(canInterface), 
+      battery_()
 {
 }
 
@@ -19,6 +22,24 @@ void BatteryEcu::run(int cycleCount)
     for (int step = 0; step < cycleCount; ++step)
     {
         battery_.update(simulationDeltaTime);
+
+        uint8_t data[8] {};
+
+        BatteryCanMessage::encode(
+            battery_.getVoltage(),
+            battery_.getCurrent(),
+            battery_.getStateOfCharge(),
+            data
+        );
+
+        if (!canSocket_.send(
+            BatteryCanMessage::CAN_ID,
+            data,
+            sizeof(data)))
+        {
+            std::cerr << "Failed to send CAN message" 
+                      << std::endl;
+        }
 
         std::cout << "Battery Voltage: "
                   << battery_.getVoltage()

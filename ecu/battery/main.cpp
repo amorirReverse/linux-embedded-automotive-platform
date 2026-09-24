@@ -9,7 +9,7 @@
  */
 int main()
 {
-    BatteryEcu ecu;
+    BatteryEcu ecu("vcan0");
 
     ecu.run(20);
 

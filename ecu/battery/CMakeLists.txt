@@ -5,3 +5,8 @@ add_executable(battery_ecu
     Battery.cpp
     BatteryEcu.cpp
 )
+
+target_link_libraries(battery_ecu
+    PRIVATE
+        can
+)

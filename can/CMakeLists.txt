@@ -3,6 +3,7 @@
 add_library(can
     CanSocket.cpp
     EngineCanMessage.cpp
+    BatteryCanMessage.cpp
 )
 
 target_include_directories(can
