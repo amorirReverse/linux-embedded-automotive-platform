@@ -14,7 +14,7 @@
 
  int main()
  {
-   EngineEcu ecu;
+   EngineEcu ecu("vcan0");
 
    ecu.run(20);
 

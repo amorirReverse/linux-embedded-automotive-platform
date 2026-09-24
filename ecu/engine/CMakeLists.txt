@@ -5,3 +5,8 @@ add_executable(engine_ecu
     Engine.cpp
     EngineEcu.cpp
 )
+
+target_link_libraries(engine_ecu
+    PRIVATE
+        can
+)
