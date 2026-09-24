@@ -33,3 +33,39 @@ void BatteryCanMessage::encode(
 
     std::memset(data + 6, 0, 2);
 }
+
+bool BatteryCanMessage::decode(
+    const uint8_t* data,
+    uint8_t dataLength,
+    double& voltage,
+    double& current,
+    double& stateOfCharge)
+{
+    if (data == nullptr || dataLength < 6)
+    {
+        return false;
+    }
+
+    const uint16_t voltageValue =
+        static_cast<uint16_t>(data[0])
+        | (static_cast<uint16_t>(data[1]) << 8);
+
+    const uint16_t currentValue =
+        static_cast<uint16_t>(data[2])
+        | (static_cast<uint16_t>(data[3]) << 8);
+
+    const uint16_t stateOfChargeValue =
+        static_cast<uint16_t>(data[4])
+        | (static_cast<uint16_t>(data[5]) << 8);
+
+    voltage =
+        static_cast<double>(voltageValue) / 100.0;
+
+    current =
+        static_cast<double>(currentValue) / 100.0;
+
+    stateOfCharge =
+        static_cast<double>(stateOfChargeValue) / 100.0;
+
+    return true;
+}

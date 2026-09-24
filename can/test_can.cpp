@@ -21,6 +21,8 @@ int main()
         800.0,
         90.0,
         data);
+    
+   
 
     if (!canSocket.send(
         EngineCanMessage::CAN_ID,
@@ -49,13 +51,39 @@ int main()
         return 1;
     }
 
+     double decodeRpm = 0.0;
+    double decodeTemperature = 0.0;
+
+    if (!EngineCanMessage::decode(
+        data,
+        sizeof(data),
+        decodeRpm,
+        decodeTemperature))
+    {
+        std::cerr   << "Failed to decode CAN message"
+                    << std::endl;
+        return 1;
+    }
+
     std::cout << "CAN message received:"
               << " ID=0x"
+              << std::hex
               << receivedCanId
               << std::dec
               <<" DLC="
               << static_cast<int>(receivedDataLength)
               << std::endl;
+
+    std::cout   << "Decoded CAN message:"
+                << " RPM=" 
+                << decodeRpm
+                << " tr/min"
+                << " Temperature=" 
+                << decodeTemperature
+                << " °C"
+                << std::endl;
+
+    
 
     return 0;
 }

@@ -30,4 +30,24 @@ struct BatteryCanMessage
         double current,
         double stateOfCharge,
         uint8_t* data);
+
+    /**
+    * @brief Decodes a battery status CAN payload.
+    *
+    * @param data Input buffer containing the CAN payload.
+    * @param dataLength Number of payload bytes.
+    * @param voltage Output battery voltage in volts.
+    * @param current Output battery current in amperes.
+    * @param stateOfCharge Output battery state of charge in percent.
+    *
+    * @return True if the payload was decoded successfully, false otherwise.
+    */
+    static bool decode(
+        const uint8_t* data,
+        uint8_t dataLength,
+        double& voltage,
+        double& current,
+        double& stateOfCharge);
+    
+    
 };

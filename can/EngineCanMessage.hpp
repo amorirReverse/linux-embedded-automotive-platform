@@ -28,4 +28,20 @@ struct EngineCanMessage
         double rpm,
         double temperature,
         uint8_t* data);
+
+    /**
+     * @brief Decodes an engine status CAN payload.
+     *
+     * @param data Input buffer containing the CAN payload.
+     * @param dataLength Number of payload bytes.
+     * @param rpm Output engine speed in revolutions per minute.
+     * @param temperature Output engine temperature in degrees Celsius.
+     *
+     * @return True if the payload was decoded successfully, false otherwise.
+     */
+    static bool decode(
+        const uint8_t* data,
+        uint8_t dataLength,
+        double& rpm,
+        double& temperature);
 };

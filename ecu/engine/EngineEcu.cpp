@@ -41,6 +41,7 @@ void EngineEcu::run(int cycleCount)
 
         std::cout << "Engine RPM: "
                   << engine_.getRpm()
+                  << " tr/min"
                   << " | Temperature: "
                   << engine_.getTemperature()
                   << " °C"

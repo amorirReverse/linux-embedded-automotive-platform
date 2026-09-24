@@ -22,3 +22,30 @@ void EngineCanMessage::encode(
 
     std::memset(data + 4, 0, 4);
 }
+
+bool EngineCanMessage::decode(
+    const uint8_t* data,
+    uint8_t dataLength,
+    double& rpm,
+    double& temperature)
+{
+    if (data == nullptr || dataLength < 4)
+    {
+        return false;
+    }
+
+    const uint16_t rpmValue =
+        static_cast<uint16_t>(data[0])
+        | (static_cast<uint16_t>(data[1]) << 8);
+
+    const uint16_t temperatureValue =
+        static_cast<uint16_t>(data[2])
+        | (static_cast<uint16_t>(data[3]) << 8);
+
+    rpm = static_cast<double>(rpmValue);
+
+    temperature =
+        static_cast<double>(temperatureValue) / 10.0;
+
+    return true;
+}
