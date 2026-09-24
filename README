@@ -25,9 +25,9 @@ Technologies
 Roadmap
 -------
 - [x] Project structure
-- [ ] Engine ECU
-- [ ] Engine simulation
-- [ ] CAN communication
+- [x] Engine ECU
+- [x] Engine simulation
+- [x] CAN communication
 - [ ] Multiple ECUs
 - [ ] Gateway
 - [ ] Unit tests
