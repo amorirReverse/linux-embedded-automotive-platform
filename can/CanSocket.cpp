@@ -85,3 +85,32 @@ bool CanSocket::send(
 
     return bytesSent == sizeof(frame);
 }
+
+bool CanSocket::receive(
+    uint32_t& canId,
+    uint8_t* data,
+    uint8_t& dataLength)
+{
+    if (socketFd_ < 0)
+    {
+        return false;
+    }
+
+    struct can_frame frame {};
+    const ssize_t bytesRead = read(
+        socketFd_,
+        &frame,
+        sizeof(frame));
+
+    if (bytesRead != sizeof(frame))
+    {
+        return false;
+    }
+
+    canId = frame.can_id;
+    dataLength = frame.len;
+
+    std::memcpy(data, frame.data, dataLength);
+
+    return true;
+}
