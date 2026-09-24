@@ -32,8 +32,8 @@ The project is under active development.
 
 * [x] Battery ECU model
 * [x] Battery ECU simulation
-* [ ] Battery ECU CAN integration
-* [ ] Multiple ECUs communicating on the same CAN bus
+* [x] Battery ECU CAN integration
+* [x] Multiple ECUs communicating on the same CAN bus
 * [ ] Gateway ECU
 * [ ] Unit tests
 
