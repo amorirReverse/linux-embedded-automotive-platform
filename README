@@ -1,0 +1,36 @@
+Linux Embedded Automotive Platform
+
+A C++ Linux embedded automotive platform simulating
+multiple ECUs communicating over a CAN bus.
+
+Status
+------
+Early development.
+
+Current milestone
+-----------------
+V0.1 - Project architecture and initial engine ECU.
+
+Technologies
+------------
+- C++17
+- Linux
+- CMake
+- Doxygen
+- GDB
+- SocketCAN
+- systemd
+- Yocto Project (planned)
+
+Roadmap
+-------
+- [x] Project structure
+- [ ] Engine ECU
+- [ ] Engine simulation
+- [ ] CAN communication
+- [ ] Multiple ECUs
+- [ ] Gateway
+- [ ] Unit tests
+- [ ] systemd services
+- [ ] Watchdog
+- [ ] Yocto Linux image
