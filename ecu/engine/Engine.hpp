@@ -1,3 +1,5 @@
+// ecu/engine/Engine.hpp
+
 #pragma once
 
 /**
@@ -47,7 +49,7 @@ public:
      * 
      * @return The current engine speed in revolutions per minute.
      */
-    double getRPM() const;
+    double getRpm() const;
 
     /**
      * @brief Gets the current engine temperature.

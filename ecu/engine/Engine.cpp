@@ -1,3 +1,5 @@
+// ecu/engine/Engine.cpp
+
 #include "Engine.hpp"
 
 Engine::Engine()
@@ -69,7 +71,7 @@ void Engine::update(double deltaTime)
     }  
 }
 
-double Engine::getRPM() const
+double Engine::getRpm() const
 {
     return rpm_;
 }
