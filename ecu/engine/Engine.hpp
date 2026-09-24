@@ -49,7 +49,15 @@ public:
      */
     double getRPM() const;
 
+    /**
+     * @brief Gets the current engine temperature.
+     * 
+     * @return Engine temperature in degrees Celsius.
+     */
+    double getTemperature() const;
+
 private:
     bool running_;
     double rpm_;
+    double temperature_;
  };

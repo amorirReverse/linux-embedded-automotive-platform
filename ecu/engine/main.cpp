@@ -22,6 +22,9 @@
 
       std::cout   << "Engine RPM: "
                   << engine.getRPM()
+                  << " | Temperature: "
+                  << engine.getTemperature()
+                  << " °C"
                   << std::endl;
    }
 
