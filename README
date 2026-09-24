@@ -36,7 +36,7 @@ Technologies
 - [x] Virtual CAN interface (`vcan0`)
 - [x] CAN socket abstraction
 - [x] C++ CAN frame transmission
-- [ ] Engine ECU CAN integration
+- [x] Engine ECU CAN integration
 
 ### V0.3 — Multi-ECU Platform
 
