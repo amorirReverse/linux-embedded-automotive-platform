@@ -12,3 +12,4 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(can)
 add_subdirectory(ecu/engine)
+add_subdirectory(ecu/battery)
