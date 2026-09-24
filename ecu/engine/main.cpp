@@ -14,8 +14,16 @@
 
    engine.start();
 
-   std::cout << "Engine ECU started." << std::endl;
-   std::cout << "Engine RPM: " << engine.getRPM() << std::endl;
+   constexpr double deltaTime = 0.1;
 
-    return 0;
+   for (int step = 0; step < 10; ++step)
+   {
+      engine.update(deltaTime);
+
+      std::cout   << "Engine RPM: "
+                  << engine.getRPM()
+                  << std::endl;
+   }
+
+   return 0;
  }

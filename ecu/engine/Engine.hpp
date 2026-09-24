@@ -26,6 +26,16 @@ public:
     void stop();
 
     /**
+     * @brief Updates the engine state.
+     * 
+     * The engine speed gradually approaches the target idle speed
+     * when the engine is running.
+     * 
+     * @param deltaTime time in seconds since the last update.
+     */
+    void update(double deltaTime);
+
+    /**
      * @brief Checks wether the engine is running.
      * 
      * @return True if the engine is running, false otherwise.

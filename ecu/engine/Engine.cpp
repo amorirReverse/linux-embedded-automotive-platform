@@ -9,7 +9,7 @@ Engine::Engine()
 void Engine::start()
 {
     running_ = true;
-    rpm_ = 800.0;
+    rpm_ = 0.0;
 }
 
 void Engine::stop()
@@ -18,9 +18,25 @@ void Engine::stop()
     rpm_ = 0.0;
 }
 
-bool Engine::isRunning() const
+void Engine::update(double deltaTime)
 {
-    return running_;
+    if (!running_)
+    {
+        return;
+    }
+
+    constexpr double targetRpm = 800.0;
+    constexpr double acceleration = 2000.0;
+
+    if (rpm_ < targetRpm)
+    {
+        rpm_ += acceleration * deltaTime;
+
+        if (rpm_ > targetRpm)
+        {
+            rpm_ = targetRpm;
+        }
+    }
 }
 
 double Engine::getRPM() const
