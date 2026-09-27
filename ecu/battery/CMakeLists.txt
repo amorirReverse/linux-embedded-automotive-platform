@@ -9,4 +9,5 @@ add_executable(battery_ecu
 target_link_libraries(battery_ecu
     PRIVATE
         can
+        common
 )

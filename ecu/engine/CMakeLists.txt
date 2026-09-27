@@ -9,4 +9,5 @@ add_executable(engine_ecu
 target_link_libraries(engine_ecu
     PRIVATE
         can
+        common
 )

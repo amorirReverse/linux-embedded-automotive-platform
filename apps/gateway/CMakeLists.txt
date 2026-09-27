@@ -6,4 +6,5 @@ add_executable(gateway
 target_link_libraries(gateway
     PRIVATE
         can
+        common
 )

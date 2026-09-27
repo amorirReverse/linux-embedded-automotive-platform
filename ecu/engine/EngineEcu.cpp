@@ -2,6 +2,7 @@
 
 #include "EngineEcu.hpp"
 #include "EngineCanMessage.hpp"
+#include "Logger.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -16,8 +17,10 @@ EngineEcu::EngineEcu(const char* canInterface)
 
 void EngineEcu::run(int cycleCount)
 {
+    Logger::info("Engine ECU started");
     constexpr auto simulationPeriod = std::chrono::milliseconds(100);
     constexpr double simulationDeltaTime = 0.1;
+
 
     for (int step = 0; step < cycleCount; ++step)
     {
@@ -35,8 +38,7 @@ void EngineEcu::run(int cycleCount)
             data,
             sizeof(data)))
         {
-            std::cerr << "Failed to send CAN message" 
-                      << std::endl;
+            Logger::error("Failed to send engine CAN message");
         }
 
         std::cout << "Engine RPM: "

@@ -2,6 +2,7 @@
 
 #include "BatteryEcu.hpp"
 #include "BatteryCanMessage.hpp"
+#include "Logger.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -16,6 +17,7 @@ BatteryEcu::BatteryEcu(const char* canInterface)
 
 void BatteryEcu::run(int cycleCount)
 {
+    Logger::info("Battery ECU started");
     constexpr auto simulationPeriod = std::chrono::milliseconds(100);
     constexpr double simulationDeltaTime = 0.1;
 
@@ -37,8 +39,7 @@ void BatteryEcu::run(int cycleCount)
             data,
             sizeof(data)))
         {
-            std::cerr << "Failed to send CAN message" 
-                      << std::endl;
+            Logger::error("Failed to send battery CAN message");
         }
 
         std::cout << "Battery Voltage: "

@@ -3,6 +3,7 @@
 #include "Gateway.hpp"
 #include "EngineCanMessage.hpp"
 #include "BatteryCanMessage.hpp"
+#include "Logger.hpp"
 
 #include <cstdint>
 #include <iostream>
@@ -14,6 +15,7 @@ Gateway::Gateway(const char* canInterface)
 
 void Gateway::run(int frameCount)
 {
+    Logger::info("Gateway started");
     for (int frame = 0; frame < frameCount; ++frame)
     {
         uint32_t canId = 0;
@@ -25,8 +27,7 @@ void Gateway::run(int frameCount)
                 data,
                 dataLength))
         {
-            std::cerr << "Failed to receive CAN message"
-                      << std::endl;
+            Logger::error("Failed to receive CAN frame");
 
             continue;
         }
