@@ -16,6 +16,12 @@ Gateway::Gateway(const char* canInterface)
 void Gateway::run(int frameCount)
 {
     Logger::info("Gateway started");
+
+    if (!canSocket_.isValid())
+    {
+        Logger::error("CAN socket is not valid.");
+        return;
+    }
     for (int frame = 0; frame < frameCount; ++frame)
     {
         uint32_t canId = 0;

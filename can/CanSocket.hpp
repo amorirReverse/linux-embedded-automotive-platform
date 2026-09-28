@@ -51,6 +51,13 @@ public:
         uint8_t* data,
         uint8_t& dataLength);
 
+    /**
+     * @brief Checks wether the CAN socket is valid.
+     * 
+     * @return True if the socket is ready for communication, false otherwise.
+     */
+    bool isValid() const;
+
 private:
     int socketFd_;
 };

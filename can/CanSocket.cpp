@@ -53,6 +53,11 @@ CanSocket::CanSocket(const std::string& interfaceName)
     }
 }
 
+bool CanSocket::isValid() const
+{
+    return socketFd_ >= 0;
+}
+
 CanSocket::~CanSocket()
 {
     if (socketFd_ >= 0)
