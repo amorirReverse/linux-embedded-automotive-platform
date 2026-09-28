@@ -80,3 +80,8 @@ double Engine::getTemperature() const
 {
     return temperature_;
 }
+
+bool Engine::isRunning() const
+{
+    return running_;
+}
