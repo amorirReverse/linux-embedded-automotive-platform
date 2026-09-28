@@ -26,16 +26,27 @@ add_executable(test_engine_can_message
     ../tests/EngineCanMessageTest.cpp
 )
 
+
 target_link_libraries(test_engine_can_message
-    PRIVATE
-        can
+PRIVATE
+can
 ) 
 
+add_test(
+    NAME engine_can_message_test
+    COMMAND test_engine_can_message
+)
+
 add_executable(test_battery_can_message
-    ../tests/BatteryCanMessageTest.cpp
+../tests/BatteryCanMessageTest.cpp
 )
 
 target_link_libraries(test_battery_can_message
-    PRIVATE
-        can
+PRIVATE
+can
+)
+
+add_test(
+    NAME battery_can_message_test
+    COMMAND test_battery_can_message
 )

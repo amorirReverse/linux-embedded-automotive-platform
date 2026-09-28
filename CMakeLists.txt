@@ -6,6 +6,8 @@ project(LinuxEmbeddedAutomotivePlatform
     LANGUAGES C CXX
 )
 
+enable_testing()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -17,6 +19,20 @@ add_library(common
 target_include_directories(common
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/common
+)
+
+add_executable(test_logger
+    tests/testLogger.cpp
+    )
+
+target_link_libraries(test_logger
+    PRIVATE
+        common
+)
+
+add_test(
+    NAME logger_test
+    COMMAND test_logger
 )
 
 add_subdirectory(can)
