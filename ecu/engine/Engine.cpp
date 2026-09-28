@@ -23,20 +23,16 @@ void Engine::stop()
 
 void Engine::update(double deltaTime)
 {
-    if (!running_)
-    {
-        return;
-    }
-
     constexpr double targetRpm = 800.0;
     constexpr double acceleration = 2000.0;
     constexpr double ambientTemperature = 20.0;
     constexpr double operatingTemperature = 90.0;
     constexpr double heatingRate = 5.0;
     constexpr double coolingRate = 1.0;
+
     if (running_)
     {
-       if (rpm_ < targetRpm)
+        if (rpm_ < targetRpm)
         {
             rpm_ += acceleration * deltaTime;
 
@@ -45,7 +41,7 @@ void Engine::update(double deltaTime)
                 rpm_ = targetRpm;
             }
         }
-    
+
         if (temperature_ < operatingTemperature)
         {
             temperature_ += heatingRate * deltaTime;
@@ -55,20 +51,19 @@ void Engine::update(double deltaTime)
                 temperature_ = operatingTemperature;
             }
         }
+
+        return;
     }
-    else
+
+    if (temperature_ > ambientTemperature)
     {
+        temperature_ -= coolingRate * deltaTime;
 
-        if (temperature_ > ambientTemperature)
+        if (temperature_ < ambientTemperature)
         {
-            temperature_ -= coolingRate * deltaTime;
-
-            if (temperature_ < ambientTemperature)
-            {
-                temperature_ = ambientTemperature;
-            }
+            temperature_ = ambientTemperature;
         }
-    }  
+    }
 }
 
 double Engine::getRpm() const

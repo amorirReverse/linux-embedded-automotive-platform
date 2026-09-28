@@ -113,6 +113,32 @@ int main()
         return 1;
     }
 
+    engine.start();
+
+    engine.update(20.0);
+
+    engine.stop();
+
+    if (!almostEqual(engine.getTemperature(), 90.0))
+    {
+        std::cerr << "Engine should reach operating temperature: "
+                  << engine.getTemperature()
+                  << std::endl;
+
+        return 1;
+    }
+
+    engine.update(10.0);
+
+    if (!almostEqual(engine.getTemperature(), 80.0))
+    {
+        std::cerr << "Unexpected temperature after cooling: "
+                  << engine.getTemperature()
+                  << std::endl;
+
+        return 1;
+    }
+
     std::cout << "Engine tests passed"
               << std::endl;
 
