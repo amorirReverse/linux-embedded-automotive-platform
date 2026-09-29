@@ -7,6 +7,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <cerrno>
 
 #include <net/if.h>
 #include <sys/ioctl.h>
@@ -20,7 +21,9 @@ CanSocket::CanSocket(const std::string& interfaceName)
 
     if (socketFd_ < 0)
     {
-        std::cerr << "Failed to create CAN socket" << std::endl;
+        std::cerr << "Failed to create CAN socket: " 
+                  << std::strerror(errno)
+                  << std::endl;
         return;
     }
 
@@ -32,7 +35,10 @@ CanSocket::CanSocket(const std::string& interfaceName)
 
     if (ioctl(socketFd_, SIOCGIFINDEX, &interfaceRequest) < 0)
     {
-        std::cerr << "Failed to get CAN interface index" << std::endl;
+        std::cerr << "Failed to get CAN interface index: " 
+                  << std::strerror(errno)
+                  << std::endl;
+
         close(socketFd_);
         socketFd_ = -1;
         return;
@@ -47,7 +53,9 @@ CanSocket::CanSocket(const std::string& interfaceName)
             reinterpret_cast<struct sockaddr*>(&address),
             sizeof(address)) < 0)
     {
-        std::cerr << "Failed to bind CAN socket" << std::endl;
+        std::cerr << "Failed to bind CAN socket: " 
+                  << std::strerror(errno)
+                  << std::endl;
         close(socketFd_);
         socketFd_ = -1;
     }
