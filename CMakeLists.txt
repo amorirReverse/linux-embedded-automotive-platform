@@ -48,6 +48,7 @@ target_link_libraries(test_configuration
 add_test(
     NAME configuration_test
     COMMAND test_configuration
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_subdirectory(can)

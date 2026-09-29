@@ -19,7 +19,7 @@ EngineEcu::EngineEcu(const char* canInterface)
 void EngineEcu::run(int cycleCount)
 {
     Logger::info("Engine ECU started");
-    Configuration configuration;
+    Configuration configuration("config/platform.conf");
     const auto simulationPeriod = 
         std::chrono::milliseconds(
             configuration.getSimulationPeriodMs());

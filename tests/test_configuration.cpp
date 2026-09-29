@@ -11,9 +11,9 @@
  */
 int main()
 {
-    Configuration configuration;
+    Configuration configuration("config/platform.conf");
 
-    if (configuration.getSimulationPeriodMs() != 100)
+    if (configuration.getSimulationPeriodMs() != 250)
     {
         std::cerr << "Unexpected simulation period: "
                   << configuration.getSimulationPeriodMs()

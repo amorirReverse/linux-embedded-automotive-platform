@@ -19,7 +19,7 @@ BatteryEcu::BatteryEcu(const char* canInterface)
 void BatteryEcu::run(int cycleCount)
 {
     Logger::info("Battery ECU started");
-    Configuration configuration;
+    Configuration configuration("config/platform.conf");
     const auto simulationPeriod =
         std::chrono::milliseconds(
             configuration.getSimulationPeriodMs());

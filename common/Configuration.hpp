@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <string>
+
 /**
  * @brief Stores platform configuration values.
  *
@@ -12,9 +14,11 @@ class Configuration
 {
 public:
     /**
-     * @brief Creates a configuration with default values.
+     * @brief Creates a configuration from a configuration file.
+     * 
+     * @param configPath Path to the configuration file.
      */
-    Configuration();
+    explicit Configuration(const std::string& configPath);
 
     /**
      * @brief Gets the ECU simulation period.
