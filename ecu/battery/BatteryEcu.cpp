@@ -3,6 +3,7 @@
 #include "BatteryEcu.hpp"
 #include "BatteryCanMessage.hpp"
 #include "Logger.hpp"
+#include "Configuration.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -18,8 +19,12 @@ BatteryEcu::BatteryEcu(const char* canInterface)
 void BatteryEcu::run(int cycleCount)
 {
     Logger::info("Battery ECU started");
-    constexpr auto simulationPeriod = std::chrono::milliseconds(100);
-    constexpr double simulationDeltaTime = 0.1;
+    Configuration configuration;
+    const auto simulationPeriod =
+        std::chrono::milliseconds(
+            configuration.getSimulationPeriodMs());
+    const double simulationDeltaTime =
+        static_cast<double>(configuration.getSimulationPeriodMs()) / 1000.0;
 
     for (int step = 0; step < cycleCount; ++step)
     {

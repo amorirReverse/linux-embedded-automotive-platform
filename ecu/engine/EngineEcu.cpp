@@ -3,6 +3,7 @@
 #include "EngineEcu.hpp"
 #include "EngineCanMessage.hpp"
 #include "Logger.hpp"
+#include "Configuration.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -18,8 +19,13 @@ EngineEcu::EngineEcu(const char* canInterface)
 void EngineEcu::run(int cycleCount)
 {
     Logger::info("Engine ECU started");
-    constexpr auto simulationPeriod = std::chrono::milliseconds(100);
-    constexpr double simulationDeltaTime = 0.1;
+    Configuration configuration;
+    const auto simulationPeriod = 
+        std::chrono::milliseconds(
+            configuration.getSimulationPeriodMs());
+
+    const double simulationDeltaTime = 
+        static_cast<double>(configuration.getSimulationPeriodMs()) / 1000.0;
 
 
     for (int step = 0; step < cycleCount; ++step)
