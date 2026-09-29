@@ -14,6 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(common
     common/Logger.cpp
+    common/Configuration.cpp
 )
 
 target_include_directories(common
@@ -33,6 +34,20 @@ target_link_libraries(test_logger
 add_test(
     NAME logger_test
     COMMAND test_logger
+)
+
+add_executable(test_configuration
+    tests/test_configuration.cpp
+)
+
+target_link_libraries(test_configuration
+    PRIVATE
+        common
+)
+
+add_test(
+    NAME configuration_test
+    COMMAND test_configuration
 )
 
 add_subdirectory(can)
