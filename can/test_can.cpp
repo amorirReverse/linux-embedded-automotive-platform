@@ -25,7 +25,7 @@ int main()
     }
 
     uint32_t invalidCanId = 0;
-    uint8_t invalidDataLength = 0;
+    uint8_t invalidDataLength = 0xFF;
 
     if (receiver.receive(
             invalidCanId,
@@ -40,7 +40,7 @@ int main()
 
     uint8_t smallData[4]{};
     uint32_t smallBufferCanId = 0;
-    uint8_t smallBufferDataLength = 0;
+    uint8_t smallBufferDataLength = 0xFF;
 
     if (receiver.receive(
             smallBufferCanId,
@@ -64,7 +64,7 @@ int main()
 
     uint32_t invalidSocketCanId = 0;
     uint8_t invalidSocketData[8]{};
-    uint8_t invalidSocketDataLength = 0;
+    uint8_t invalidSocketDataLength = 0xFF;
 
     if (invalidSocket.receive(
             invalidSocketCanId,
@@ -92,7 +92,7 @@ int main()
             nullptr,
             1))
     {
-        std::cerr << "send() accepted a null data buffer"
+        std::cerr << "send() accepted a null data buffer with non-zero length"
                   << std::endl;
         return 1;
     }
@@ -151,7 +151,7 @@ int main()
             oversizedData,
             sizeof(oversizedData)))
     {
-        std::cerr << "send() accepted an oversized data buffer"
+        std::cerr << "send() accepted a payload larger than CAN_MAX_DLEN"
                   << std::endl;
         return 1;
     }
