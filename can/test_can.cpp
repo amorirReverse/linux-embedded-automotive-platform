@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <cstring>
 
 /**
  * @brief Entry point for the CAN socket test.
@@ -159,6 +160,52 @@ int main()
     {
         std::cerr   << "Received unexpected data length: "
                     << static_cast<int>(receivedDataLength)
+                    << std::endl;
+        return 1;
+    }
+
+    uint8_t largeBuffer[16] {};
+    uint32_t largeBufferCanId = 0;
+    uint8_t largeBufferDataLength = 0; 
+    
+    if (!sender.send(
+        EngineCanMessage::CAN_ID,
+        data,
+        sizeof(data)))
+    {
+        std::cerr   << "Failed to send CAN frame for large buffer test"
+                    << std::endl;
+        return 1;
+    }
+
+    if (!receiver.receive(
+        largeBufferCanId,
+        largeBuffer,
+        largeBufferDataLength,
+        sizeof(largeBuffer)))
+    {
+        std::cerr   << "Failed to receive CAN frame into a larger buffer"
+                    << std::endl;
+        return 1;
+    }
+
+    if (largeBufferCanId != EngineCanMessage::CAN_ID)
+    {
+        std::cerr   << "Large buffer test received unexpected CAN ID"
+                    << std::endl;
+        return 1;
+    }
+
+    if (largeBufferDataLength != sizeof(data))
+    {
+        std::cerr   << "Large buffer test received unexpected data length"
+                    << std::endl;
+        return 1;
+    }
+
+    if (std::memcmp(largeBuffer, data, sizeof(data)) != 0)
+    {
+        std::cerr   << "Large buffer test received corrupted CAN data"
                     << std::endl;
         return 1;
     }
