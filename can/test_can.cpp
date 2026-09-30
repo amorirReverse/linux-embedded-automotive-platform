@@ -13,7 +13,15 @@
  */
 int main()
 {
-    CanSocket canSocket("vcan0");
+    CanSocket sender("vcan0");
+    CanSocket receiver("vcan0");
+
+    if (!sender.isValid() || !receiver.isValid())
+    {
+        std::cerr   << "Failed to initialize CAN sockets"
+                    << std::endl;
+        return 1;
+    }
 
     uint8_t data[8] {};
 
@@ -24,7 +32,7 @@ int main()
     
    
 
-    if (!canSocket.send(
+    if (!sender.send(
         EngineCanMessage::CAN_ID,
         data,
         sizeof(data)))
@@ -41,7 +49,7 @@ int main()
     uint8_t receivedData[8] {};
     uint8_t receivedDataLength = 0;
 
-    if (!canSocket.receive(
+    if (!receiver.receive(
         receivedCanId,
         receivedData,
         receivedDataLength,
@@ -52,16 +60,50 @@ int main()
         return 1;
     }
 
+    if (receivedCanId != EngineCanMessage::CAN_ID)
+    {
+        std::cerr   << "Received unexpected CAN ID: 0x"
+                    << std::hex
+                    << receivedCanId
+                    << std::dec
+                    << std::endl;
+        return 1;
+    }
+
+    if (receivedDataLength != sizeof(receivedData))
+    {
+        std::cerr   << "Received unexpected data length: "
+                    << static_cast<int>(receivedDataLength)
+                    << std::endl;
+        return 1;
+    }
+
      double decodeRpm = 0.0;
     double decodeTemperature = 0.0;
 
     if (!EngineCanMessage::decode(
-        data,
-        sizeof(data),
+        receivedData,
+        receivedDataLength,
         decodeRpm,
         decodeTemperature))
     {
         std::cerr   << "Failed to decode CAN message"
+                    << std::endl;
+        return 1;
+    }
+
+    if (decodeRpm != 800.0)
+    {
+        std::cerr   << "Decoded RPM does not match expected value: "
+                    << decodeRpm
+                    << std::endl;
+        return 1;
+    }
+
+    if (decodeTemperature != 90.0)
+    {
+        std::cerr   << "Decoded temperature does not match expected value: "
+                    << decodeTemperature
                     << std::endl;
         return 1;
     }
