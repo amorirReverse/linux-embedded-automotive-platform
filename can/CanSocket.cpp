@@ -79,7 +79,7 @@ bool CanSocket::send(
     const uint8_t* data,
     uint8_t dataLength)
 {
-    if (socketFd_ < 0 ||socketFd_ < 0 || dataLength > CAN_MAX_DLEN)
+    if (socketFd_ < 0 || data == nullptr || dataLength > CAN_MAX_DLEN)
     {
         return false;
     }

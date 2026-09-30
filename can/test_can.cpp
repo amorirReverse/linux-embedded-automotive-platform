@@ -76,6 +76,16 @@ int main()
         return 1;
     }
 
+    if (sender.send(
+        EngineCanMessage::CAN_ID,
+        nullptr,
+        1))
+    {
+        std::cerr   << "send() accepted a null data buffer"
+                    << std::endl;
+        return 1;
+    }
+
     uint8_t data[8] {};
 
     EngineCanMessage::encode(
