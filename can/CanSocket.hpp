@@ -41,7 +41,7 @@ public:
      * @brief Receives a CAN data frame.
      * 
      * @param canId Output CAN frame identifier.
-     * @param data Output buffer containing the payload data.
+     * @param data Output buffer receiving the payload data.
      * @param dataLength Output number of payload bytes.
      * @param dataCapacity Maximum number of bytes that can be written to the data buffer.
      *
@@ -54,7 +54,7 @@ public:
         uint8_t dataCapacity);
 
     /**
-     * @brief Checks wether the CAN socket is valid.
+     * @brief Checks whether the CAN socket is valid.
      * 
      * @return True if the socket is ready for communication, false otherwise.
      */
