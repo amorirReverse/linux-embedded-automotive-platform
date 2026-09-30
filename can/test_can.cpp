@@ -52,6 +52,30 @@ int main()
         return 1;
     }
 
+    CanSocket invalidSocket("invalid_can_interface");
+
+    if (invalidSocket.isValid())
+    {
+        std::cerr   << "Invalid CAN interface was accepted"
+                    << std::endl;
+        return 1;
+    }
+
+    uint32_t invalidSocketCanId = 0;
+    uint8_t invalidSocketData[8] {};
+    uint8_t invalidSocketDataLength = 0;
+
+    if (invalidSocket.receive(
+        invalidSocketCanId,
+        invalidSocketData,
+        invalidSocketDataLength,
+        sizeof(invalidSocketData)))
+    {
+        std::cerr   << "receive() accepted an invalid socket"
+                    << std::endl;
+        return 1;
+    }
+
     uint8_t data[8] {};
 
     EngineCanMessage::encode(
