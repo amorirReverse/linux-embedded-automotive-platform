@@ -23,6 +23,35 @@ int main()
         return 1;
     }
 
+    uint32_t invalidCanId = 0;
+    uint8_t invalidDataLength = 0;
+
+    if (receiver.receive(
+        invalidCanId,
+        nullptr,
+        invalidDataLength,
+        0))
+    {
+        std::cerr   << "receive() accepted a null data buffer"
+                    << std::endl;
+        return 1;
+    }
+
+    uint8_t smallData[4] {};
+    uint32_t smallBufferCanId = 0;
+    uint8_t smallBufferDataLength = 0;
+
+    if (receiver.receive(
+        smallBufferCanId,
+        smallData,
+        smallBufferDataLength,
+        sizeof(smallData)))
+    {
+        std::cerr   << "receive() accepted an undersized data buffer"
+                    << std::endl;
+        return 1;
+    }
+
     uint8_t data[8] {};
 
     EngineCanMessage::encode(
