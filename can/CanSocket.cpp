@@ -14,20 +14,20 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-CanSocket::CanSocket(const std::string& interfaceName)
+CanSocket::CanSocket(const std::string &interfaceName)
     : socketFd_(-1)
 {
     socketFd_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 
     if (socketFd_ < 0)
     {
-        std::cerr << "Failed to create CAN socket: " 
+        std::cerr << "Failed to create CAN socket: "
                   << std::strerror(errno)
                   << std::endl;
         return;
     }
 
-    struct ifreq interfaceRequest {};
+    struct ifreq interfaceRequest{};
     std::strncpy(
         interfaceRequest.ifr_name,
         interfaceName.c_str(),
@@ -35,7 +35,7 @@ CanSocket::CanSocket(const std::string& interfaceName)
 
     if (ioctl(socketFd_, SIOCGIFINDEX, &interfaceRequest) < 0)
     {
-        std::cerr << "Failed to get CAN interface index: " 
+        std::cerr << "Failed to get CAN interface index: "
                   << std::strerror(errno)
                   << std::endl;
 
@@ -44,16 +44,16 @@ CanSocket::CanSocket(const std::string& interfaceName)
         return;
     }
 
-    struct sockaddr_can address {};
+    struct sockaddr_can address{};
     address.can_family = AF_CAN;
     address.can_ifindex = interfaceRequest.ifr_ifindex;
 
     if (bind(
             socketFd_,
-            reinterpret_cast<struct sockaddr*>(&address),
+            reinterpret_cast<struct sockaddr *>(&address),
             sizeof(address)) < 0)
     {
-        std::cerr << "Failed to bind CAN socket: " 
+        std::cerr << "Failed to bind CAN socket: "
                   << std::strerror(errno)
                   << std::endl;
         close(socketFd_);
@@ -66,17 +66,17 @@ bool CanSocket::isValid() const
     return socketFd_ >= 0;
 }
 
- CanSocket::~CanSocket()
+CanSocket::~CanSocket()
 {
-     if (socketFd_ >= 0)
-     {
-         close(socketFd_);
-     }
+    if (socketFd_ >= 0)
+    {
+        close(socketFd_);
+    }
 }
 
 bool CanSocket::send(
     uint32_t canId,
-    const uint8_t* data,
+    const uint8_t *data,
     uint8_t dataLength)
 {
     if (socketFd_ < 0 || data == nullptr || dataLength > CAN_MAX_DLEN)
@@ -84,7 +84,7 @@ bool CanSocket::send(
         return false;
     }
 
-    struct can_frame frame {};
+    struct can_frame frame{};
 
     frame.can_id = canId;
     frame.len = dataLength;
@@ -100,9 +100,9 @@ bool CanSocket::send(
 }
 
 bool CanSocket::receive(
-    uint32_t& canId,
-    uint8_t* data,
-    uint8_t& dataLength,
+    uint32_t &canId,
+    uint8_t *data,
+    uint8_t &dataLength,
     uint8_t dataCapacity)
 {
     if (socketFd_ < 0 || data == nullptr || dataCapacity < CAN_MAX_DLEN)
@@ -110,13 +110,18 @@ bool CanSocket::receive(
         return false;
     }
 
-    struct can_frame frame {};
+    struct can_frame frame{};
     const ssize_t bytesRead = read(
         socketFd_,
         &frame,
         sizeof(frame));
 
     if (bytesRead != sizeof(frame))
+    {
+        return false;
+    }
+
+    if (frame.len > CAN_MAX_DLEN)
     {
         return false;
     }
