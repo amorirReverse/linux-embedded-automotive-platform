@@ -66,12 +66,12 @@ bool CanSocket::isValid() const
     return socketFd_ >= 0;
 }
 
-CanSocket::~CanSocket()
+ CanSocket::~CanSocket()
 {
-    if (socketFd_ >= 0)
-    {
-        close(socketFd_);
-    }
+     if (socketFd_ >= 0)
+     {
+         close(socketFd_);
+     }
 }
 
 bool CanSocket::send(
@@ -79,7 +79,7 @@ bool CanSocket::send(
     const uint8_t* data,
     uint8_t dataLength)
 {
-    if (socketFd_ < 0 || dataLength > CAN_MAX_DLEN)
+    if (socketFd_ < 0 ||socketFd_ < 0 || dataLength > CAN_MAX_DLEN)
     {
         return false;
     }
@@ -105,7 +105,7 @@ bool CanSocket::receive(
     uint8_t& dataLength,
     uint8_t dataCapacity)
 {
-    if (data == nullptr || dataCapacity < CAN_MAX_DLEN)
+    if (socketFd_ < 0 || data == nullptr || dataCapacity < CAN_MAX_DLEN)
     {
         return false;
     }
