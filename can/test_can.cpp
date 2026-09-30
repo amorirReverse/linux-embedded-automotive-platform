@@ -86,6 +86,18 @@ int main()
         return 1;
     }
 
+    uint8_t oversizedData[9] {};
+
+    if (sender.send(
+        EngineCanMessage::CAN_ID,
+        oversizedData,
+        sizeof(oversizedData)))
+    {
+        std::cerr   << "send() accepted an oversized data buffer"
+                    << std::endl;
+        return 1;
+    }
+
     uint8_t data[8] {};
 
     EngineCanMessage::encode(
