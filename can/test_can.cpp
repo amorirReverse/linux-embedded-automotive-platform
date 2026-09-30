@@ -76,6 +76,16 @@ int main()
         return 1;
     }
 
+    if (invalidSocket.send(
+        EngineCanMessage::CAN_ID,
+        invalidSocketData,
+        sizeof(invalidSocketData)))
+    {
+        std::cerr   << "send() accepted an invalid socket"
+                    << std::endl;
+        return 1;
+    }
+
     if (sender.send(
         EngineCanMessage::CAN_ID,
         nullptr,
