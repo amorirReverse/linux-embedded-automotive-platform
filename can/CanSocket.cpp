@@ -105,7 +105,7 @@ bool CanSocket::receive(
     uint8_t &dataLength,
     uint8_t dataCapacity)
 {
-    if (socketFd_ < 0 || data == nullptr || dataCapacity < CAN_MAX_DLEN)
+    if (socketFd_ < 0 || data == nullptr)
     {
         return false;
     }
@@ -122,6 +122,11 @@ bool CanSocket::receive(
     }
 
     if (frame.len > CAN_MAX_DLEN)
+    {
+        return false;
+    }
+
+    if (dataCapacity < frame.len)
     {
         return false;
     }
