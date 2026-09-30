@@ -22,6 +22,11 @@ target_link_libraries(test_can
         can
 )
 
+add_test(
+    NAME can_test
+    COMMAND test_can
+)
+
 add_executable(test_engine_can_message
     ../tests/EngineCanMessageTest.cpp
 )

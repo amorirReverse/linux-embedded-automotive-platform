@@ -102,9 +102,10 @@ bool CanSocket::send(
 bool CanSocket::receive(
     uint32_t& canId,
     uint8_t* data,
-    uint8_t& dataLength)
+    uint8_t& dataLength,
+    uint8_t dataCapacity)
 {
-    if (socketFd_ < 0)
+    if (data == nullptr || dataCapacity < CAN_MAX_DLEN)
     {
         return false;
     }

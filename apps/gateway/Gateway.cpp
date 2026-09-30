@@ -31,7 +31,8 @@ void Gateway::run(int frameCount)
         if (!canSocket_.receive(
                 canId,
                 data,
-                dataLength))
+                dataLength,
+                sizeof(data)))
         {
             Logger::error("Failed to receive CAN frame");
 

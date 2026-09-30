@@ -44,7 +44,8 @@ int main()
     if (!canSocket.receive(
         receivedCanId,
         receivedData,
-        receivedDataLength))
+        receivedDataLength,
+        sizeof(receivedData)))
     {
         std::cerr   << "Failed to receive CAN frame"
                     << std::endl;

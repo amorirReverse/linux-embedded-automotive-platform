@@ -43,13 +43,15 @@ public:
      * @param canId Output CAN frame identifier.
      * @param data Output buffer containing the payload data.
      * @param dataLength Output number of payload bytes.
+     * @param dataCapacity Maximum number of bytes that can be written to the data buffer.
      *
      * @return True if a frame was received successfully, false otherwise.
      */
     bool receive(
         uint32_t& canId,
         uint8_t* data,
-        uint8_t& dataLength);
+        uint8_t& dataLength,
+        uint8_t dataCapacity);
 
     /**
      * @brief Checks wether the CAN socket is valid.
