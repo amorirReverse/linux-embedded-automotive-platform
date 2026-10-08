@@ -7,7 +7,7 @@
 
 /**
  * @brief Provides access to a Linux SocketCAN interface.
- * 
+ *
  * The CanSocket class opens a CAN_RAW socket and binds it
  * to a specific Linux CAN network interface.
  */
@@ -16,10 +16,10 @@ class CanSocket
 public:
     /**
      * @brief Creates a CAN socket.
-     * 
+     *
      * @param interfaceName Linux CAN interface name, for example "vcan0".
      */
-    explicit  CanSocket(const std::string& interfaceName);
+    explicit CanSocket(const std::string &interfaceName);
 
     /**
      * @brief Destroys the CAN socket.
@@ -35,27 +35,33 @@ public:
      *
      * @return True if the frame was sent successfully, false otherwise.
      */
-    bool send(uint32_t canId, const uint8_t* data, uint8_t dataLength);
+    bool send(uint32_t canId, const uint8_t *data, uint8_t dataLength);
 
     /**
      * @brief Receives a CAN data frame.
-     * 
+     *
+     * The function blocks until a CAN frame is received.
+     * If the provided data buffer is too small for the received
+     * payload, the frame is consumed but no payload data is copied
+     * and the function returns false.
+     *
      * @param canId Output CAN frame identifier.
      * @param data Output buffer receiving the payload data.
      * @param dataLength Output number of payload bytes.
      * @param dataCapacity Maximum number of bytes that can be written to the data buffer.
      *
-     * @return True if a frame was received successfully, false otherwise.
+     * @return True if the frame was received and copied successfully,
+     *         false otherwise.
      */
     bool receive(
-        uint32_t& canId,
-        uint8_t* data,
-        uint8_t& dataLength,
+        uint32_t &canId,
+        uint8_t *data,
+        uint8_t &dataLength,
         uint8_t dataCapacity);
 
     /**
      * @brief Checks whether the CAN socket is valid.
-     * 
+     *
      * @return True if the socket is ready for communication, false otherwise.
      */
     bool isValid() const;

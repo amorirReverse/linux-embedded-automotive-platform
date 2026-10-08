@@ -14,6 +14,9 @@ cmake-build-*/
 # Test output
 Testing/
 
+# Coverage files
+lcov.info
+
 # Generated documentation
 docs/doxygen/
 

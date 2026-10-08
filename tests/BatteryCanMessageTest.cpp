@@ -8,10 +8,10 @@
 
 namespace
 {
-bool almostEqual(double lhs, double rhs)
-{
-    return std::abs(lhs - rhs) < 0.001;
-}
+    bool almostEqual(double lhs, double rhs)
+    {
+        return std::abs(lhs - rhs) < 0.001;
+    }
 }
 
 /**
@@ -21,13 +21,18 @@ bool almostEqual(double lhs, double rhs)
  */
 int main()
 {
-    uint8_t data[8] {};
+    uint8_t data[8]{};
 
-    BatteryCanMessage::encode(
-        12.6,
-        10.0,
-        99.8,
-        data);
+    if (!BatteryCanMessage::encode(
+            12.6,
+            10.0,
+            99.8,
+            data))
+    {
+        std::cerr << "Failed to encode battery CAN message"
+                  << std::endl;
+        return 1;
+    }
 
     double voltage = 0.0;
     double current = 0.0;
@@ -73,15 +78,14 @@ int main()
         return 1;
     }
 
-    uint8_t invalidData[5] {};
+    uint8_t invalidData[5]{};
 
-    if(BatteryCanMessage::decode(
-        invalidData,
-        sizeof(invalidData),
-        voltage,
-        current,
-        stateOfCharge
-    ))
+    if (BatteryCanMessage::decode(
+            invalidData,
+            sizeof(invalidData),
+            voltage,
+            current,
+            stateOfCharge))
     {
         std::cerr << "Decode unexpectedly accepted"
                   << " an invalid payload"
@@ -91,15 +95,28 @@ int main()
     }
 
     if (BatteryCanMessage::decode(
-        nullptr,
-        0,
-        voltage,
-        current,
-        stateOfCharge))
+            nullptr,
+            0,
+            voltage,
+            current,
+            stateOfCharge))
     {
         std::cerr << "Decode unexpectedly accepted"
-                << " a null payload"
-                << std::endl;
+                  << " a null payload"
+                  << std::endl;
+
+        return 1;
+    }
+
+    if (BatteryCanMessage::encode(
+            0.0,
+            0.0,
+            0.0,
+            nullptr))
+    {
+        std::cerr << "Encode unexpectedly accepted"
+                  << " a null payload"
+                  << std::endl;
 
         return 1;
     }

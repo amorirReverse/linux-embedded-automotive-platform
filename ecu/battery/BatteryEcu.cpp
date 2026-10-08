@@ -10,8 +10,8 @@
 #include <iostream>
 #include <thread>
 
-BatteryEcu::BatteryEcu(const char* canInterface)
-    : canSocket_(canInterface), 
+BatteryEcu::BatteryEcu(const char *canInterface)
+    : canSocket_(canInterface),
       battery_()
 {
 }
@@ -19,6 +19,11 @@ BatteryEcu::BatteryEcu(const char* canInterface)
 void BatteryEcu::run(int cycleCount)
 {
     Logger::info("Battery ECU started");
+    if (!canSocket_.isValid())
+    {
+        Logger::error("Battery ECU CAN socket is not valid");
+        return;
+    }
     Configuration configuration("config/platform.conf");
     const auto simulationPeriod =
         std::chrono::milliseconds(
@@ -30,19 +35,22 @@ void BatteryEcu::run(int cycleCount)
     {
         battery_.update(simulationDeltaTime);
 
-        uint8_t data[8] {};
+        uint8_t data[8]{};
 
-        BatteryCanMessage::encode(
-            battery_.getVoltage(),
-            battery_.getCurrent(),
-            battery_.getStateOfCharge(),
-            data
-        );
+        if (!BatteryCanMessage::encode(
+                battery_.getVoltage(),
+                battery_.getCurrent(),
+                battery_.getStateOfCharge(),
+                data))
+        {
+            Logger::error("Failed to encode battery CAN message");
+            return;
+        }
 
         if (!canSocket_.send(
-            BatteryCanMessage::CAN_ID,
-            data,
-            sizeof(data)))
+                BatteryCanMessage::CAN_ID,
+                data,
+                sizeof(data)))
         {
             Logger::error("Failed to send battery CAN message");
         }
@@ -52,7 +60,7 @@ void BatteryEcu::run(int cycleCount)
                   << " V"
                   << " | Current: "
                   << battery_.getCurrent()
-                  << " A" 
+                  << " A"
                   << " | State of Charge: "
                   << battery_.getStateOfCharge()
                   << " %"

@@ -24,6 +24,7 @@ int main()
         return 1;
     }
 
+    // Validate receive input buffer
     uint32_t invalidCanId = 0;
     uint8_t invalidDataLength = 0xFF;
 
@@ -34,6 +35,18 @@ int main()
             0))
     {
         std::cerr << "receive() accepted a null data buffer"
+                  << std::endl;
+        return 1;
+    }
+    // Validate receive buffer capacity
+    uint8_t smallBufferTestData[8]{};
+
+    if (!sender.send(
+            EngineCanMessage::CAN_ID,
+            smallBufferTestData,
+            sizeof(smallBufferTestData)))
+    {
+        std::cerr << "Failed to send CAN frame for small buffer test"
                   << std::endl;
         return 1;
     }
@@ -53,6 +66,7 @@ int main()
         return 1;
     }
 
+    // Validate invalid CAN socket
     CanSocket invalidSocket("invalid_can_interface");
 
     if (invalidSocket.isValid())
@@ -87,6 +101,7 @@ int main()
         return 1;
     }
 
+    // Validate send input buffer
     if (sender.send(
             EngineCanMessage::CAN_ID,
             nullptr,
@@ -97,6 +112,7 @@ int main()
         return 1;
     }
 
+    // Validate zero-length CAN frame
     uint8_t data[8]{};
 
     if (!sender.send(
@@ -144,6 +160,8 @@ int main()
                   << std::endl;
         return 1;
     }
+
+    // Validate payload length
     uint8_t oversizedData[9]{};
 
     if (sender.send(
@@ -156,10 +174,16 @@ int main()
         return 1;
     }
 
-    EngineCanMessage::encode(
-        800.0,
-        90.0,
-        data);
+    // Validate engine CAN message transmission
+    if (!EngineCanMessage::encode(
+            800.0,
+            90.0,
+            data))
+    {
+        std::cerr << "Failed to encode engine CAN message"
+                  << std::endl;
+        return 1;
+    }
 
     if (!sender.send(
             EngineCanMessage::CAN_ID,
@@ -214,6 +238,7 @@ int main()
         return 1;
     }
 
+    // Validate reception into a larger buffer
     uint8_t largeBuffer[16]{};
     uint32_t largeBufferCanId = 0;
     uint8_t largeBufferDataLength = 0;

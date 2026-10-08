@@ -9,6 +9,12 @@ add_library(can
 target_include_directories(can
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../common
+)
+
+target_link_libraries(can
+    PUBLIC
+        common
 )
 
 add_executable(test_can

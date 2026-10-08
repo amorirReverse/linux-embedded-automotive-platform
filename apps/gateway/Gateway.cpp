@@ -7,8 +7,10 @@
 
 #include <cstdint>
 #include <iostream>
+#include <string>
+#include <sstream>
 
-Gateway::Gateway(const char* canInterface)
+Gateway::Gateway(const char *canInterface)
     : canSocket_(canInterface)
 {
 }
@@ -25,7 +27,7 @@ void Gateway::run(int frameCount)
     for (int frame = 0; frame < frameCount; ++frame)
     {
         uint32_t canId = 0;
-        uint8_t data[8] {};
+        uint8_t data[8]{};
         uint8_t dataLength = 0;
 
         if (!canSocket_.receive(
@@ -47,7 +49,7 @@ void Gateway::run(int frameCount)
                   << " DLC="
                   << static_cast<int>(dataLength)
                   << std::endl;
-        
+
         if (canId == EngineCanMessage::CAN_ID)
         {
             double rpm = 0.0;
@@ -68,13 +70,15 @@ void Gateway::run(int frameCount)
                           << " °C"
                           << std::endl;
             }
-
-        
+            else
+            {
+                Logger::warning("Invalid Engine CAN frame received");
+            }
         }
 
-        if (canId == BatteryCanMessage::CAN_ID)
+        else if (canId == BatteryCanMessage::CAN_ID)
         {
-             double voltage = 0.0;
+            double voltage = 0.0;
             double current = 0.0;
             double stateOfCharge = 0.0;
 
@@ -97,6 +101,20 @@ void Gateway::run(int frameCount)
                           << " %"
                           << std::endl;
             }
+            else
+            {
+                Logger::warning("Invalid Battery CAN frame received");
+            }
+        }
+        else
+        {
+            std::ostringstream messages;
+
+            messages << "Unknown CAN frame received with ID = 0x"
+                     << std::hex
+                     << canId;
+
+            Logger::warning(messages.str());
         }
     }
 }

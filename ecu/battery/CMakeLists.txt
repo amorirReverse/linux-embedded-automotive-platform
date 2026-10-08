@@ -31,3 +31,26 @@ add_test(
     NAME battery_test
     COMMAND test_battery
 )
+
+add_executable(test_battery_ecu
+    Battery.cpp
+    BatteryEcu.cpp
+    ../../tests/test_battery_ecu.cpp
+)
+
+target_link_libraries(test_battery_ecu
+    PRIVATE
+        can
+        common
+)
+
+target_include_directories(test_battery_ecu
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_test(
+    NAME battery_ecu_test
+    COMMAND test_battery_ecu
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../..
+)

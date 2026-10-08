@@ -6,7 +6,7 @@
 
 /**
  * @brief CAN message containing engine status information.
- * 
+ *
  * The message contains the engine speed and temperature
  * encoded into an 8-byte CAN payload.
  */
@@ -18,16 +18,23 @@ struct EngineCanMessage
     static constexpr uint32_t CAN_ID = 0x100;
 
     /**
+     * @brief Size of the engine status CAN payload.
+     */
+    static constexpr uint8_t PAYLOAD_LENGTH = 8;
+
+    /**
      * @brief Encodes engine status into a CAN payload.
-     * 
+     *
      * @param rpm Engine speed in revolutions per minute.
      * @param temperature Engine temperature in degrees Celsius.
      * @param data Output buffer containing the encoded 8-byte payload.
+     *
+     * @return True if the payload was encoded successfully, false otherwise.
      */
-    static void encode(
+    static bool encode(
         double rpm,
         double temperature,
-        uint8_t* data);
+        uint8_t *data);
 
     /**
      * @brief Decodes an engine status CAN payload.
@@ -40,8 +47,8 @@ struct EngineCanMessage
      * @return True if the payload was decoded successfully, false otherwise.
      */
     static bool decode(
-        const uint8_t* data,
+        const uint8_t *data,
         uint8_t dataLength,
-        double& rpm,
-        double& temperature);
+        double &rpm,
+        double &temperature);
 };

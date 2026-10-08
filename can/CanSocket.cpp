@@ -1,6 +1,7 @@
 // can/CanSocket.cpp
 
 #include "CanSocket.hpp"
+#include "Logger.hpp"
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
@@ -96,7 +97,16 @@ bool CanSocket::send(
         &frame,
         sizeof(frame));
 
-    return bytesSent == sizeof(frame);
+    if (bytesSent != sizeof(frame))
+    {
+        Logger::error(
+            "Failed to send CAN frame: " +
+            std::string(std::strerror(errno)));
+
+        return false;
+    }
+
+    return true;
 }
 
 bool CanSocket::receive(
@@ -118,6 +128,10 @@ bool CanSocket::receive(
 
     if (bytesRead != sizeof(frame))
     {
+        Logger::error(
+            "Failed to read CAN frame: " +
+            std::string(std::strerror(errno)));
+
         return false;
     }
 

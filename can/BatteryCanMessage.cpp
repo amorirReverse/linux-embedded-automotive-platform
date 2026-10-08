@@ -4,12 +4,17 @@
 
 #include <cstring>
 
-void BatteryCanMessage::encode(
+bool BatteryCanMessage::encode(
     double voltage,
     double current,
     double stateOfCharge,
-    uint8_t* data)
+    uint8_t *data)
 {
+    if (data == nullptr)
+    {
+        return false;
+    }
+
     const auto voltageValue =
         static_cast<uint16_t>(voltage * 100.0);
 
@@ -32,14 +37,16 @@ void BatteryCanMessage::encode(
         (stateOfChargeValue >> 8) & 0xFF);
 
     std::memset(data + 6, 0, 2);
+
+    return true;
 }
 
 bool BatteryCanMessage::decode(
-    const uint8_t* data,
+    const uint8_t *data,
     uint8_t dataLength,
-    double& voltage,
-    double& current,
-    double& stateOfCharge)
+    double &voltage,
+    double &current,
+    double &stateOfCharge)
 {
     if (data == nullptr || dataLength < 6)
     {
@@ -47,16 +54,13 @@ bool BatteryCanMessage::decode(
     }
 
     const uint16_t voltageValue =
-        static_cast<uint16_t>(data[0])
-        | (static_cast<uint16_t>(data[1]) << 8);
+        static_cast<uint16_t>(data[0]) | (static_cast<uint16_t>(data[1]) << 8);
 
     const uint16_t currentValue =
-        static_cast<uint16_t>(data[2])
-        | (static_cast<uint16_t>(data[3]) << 8);
+        static_cast<uint16_t>(data[2]) | (static_cast<uint16_t>(data[3]) << 8);
 
     const uint16_t stateOfChargeValue =
-        static_cast<uint16_t>(data[4])
-        | (static_cast<uint16_t>(data[5]) << 8);
+        static_cast<uint16_t>(data[4]) | (static_cast<uint16_t>(data[5]) << 8);
 
     voltage =
         static_cast<double>(voltageValue) / 100.0;

@@ -12,6 +12,20 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+option(ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
+
+if(ENABLE_COVERAGE)
+    add_compile_options(
+        --coverage
+        -O0
+        -g
+    )
+
+    add_link_options(
+        --coverage
+    )
+endif()
+
 add_library(common
     common/Logger.cpp
     common/Configuration.cpp
