@@ -11,7 +11,7 @@ int main()
 {
     Gateway gateway("vcan0");
 
-    gateway.run(10);
+    gateway.run();
 
     return 0;
 }

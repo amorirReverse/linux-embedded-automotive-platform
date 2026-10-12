@@ -8,15 +8,15 @@
 
 /**
  * @brief Entry point of the engine ECU simulation.
- * 
+ *
  * @return Zero on sucessful execution.
  */
 
- int main()
- {
-   EngineEcu ecu("vcan0");
+int main()
+{
+  EngineEcu ecu("vcan0");
 
-   ecu.run(20);
+  ecu.run();
 
-   return 0;
- }
+  return 0;
+}

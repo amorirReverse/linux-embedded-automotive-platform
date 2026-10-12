@@ -1,0 +1,11 @@
+[Unit]
+Description=Create virtual CAN interface vcan0
+Before=engine-ecu.service battery-ecu.service gateway.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/setup_vcan0.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

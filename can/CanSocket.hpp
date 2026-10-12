@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <string>
+#include <poll.h>
 
 /**
  * @brief Provides access to a Linux SocketCAN interface.
@@ -36,6 +37,23 @@ public:
      * @return True if the frame was sent successfully, false otherwise.
      */
     bool send(uint32_t canId, const uint8_t *data, uint8_t dataLength);
+
+    /**
+     * @brief Receive a CAN frame with a timeout.
+     *
+     * @param canId Output CAN frame identifier.
+     * @param data Output payload buffer.
+     * @param dataLength Output payload length.
+     * @param dataCapacity Maximun writable payload size.
+     * @param timeoutMs Maximum wait time in milliseconds.
+     * @return True if a frame was received successfully, false on timeout or error.
+     */
+    bool receive(
+        uint32_t &canId,
+        uint8_t *data,
+        uint8_t &dataLength,
+        uint8_t dataCapacity,
+        int timeoutMs);
 
     /**
      * @brief Receives a CAN data frame.

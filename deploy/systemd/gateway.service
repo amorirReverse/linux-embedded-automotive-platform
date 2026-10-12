@@ -1,0 +1,13 @@
+[Unit]
+Description=Linux Embedded Automotive Gateway
+Requires=vcan0.service
+After=vcan0.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/gateway
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=Linux Embedded Automotive Battery ECU
+Requires=vcan0.service
+After=vcan0.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/battery_ecu
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

@@ -14,6 +14,7 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <poll.h>
 
 CanSocket::CanSocket(const std::string &interfaceName)
     : socketFd_(-1)
@@ -115,12 +116,55 @@ bool CanSocket::receive(
     uint8_t &dataLength,
     uint8_t dataCapacity)
 {
+    return receive(
+        canId,
+        data,
+        dataLength,
+        dataCapacity,
+        -1);
+}
+
+bool CanSocket::receive(
+    uint32_t &canId,
+    uint8_t *data,
+    uint8_t &dataLength,
+    uint8_t dataCapacity,
+    int timeoutMs)
+{
     if (socketFd_ < 0 || data == nullptr)
     {
         return false;
     }
 
     struct can_frame frame{};
+    pollfd descriptor{};
+    descriptor.fd = socketFd_;
+    descriptor.events = POLLIN;
+
+    const int pollResult = poll(&descriptor, 1, timeoutMs);
+
+    if (pollResult == 0)
+    {
+        return false;
+    }
+
+    if (pollResult < 0)
+    {
+        if (errno == EINTR)
+        {
+            return false;
+        }
+
+        Logger::error("CAN socket poll failed");
+        return false;
+    }
+
+    if ((descriptor.revents & POLLIN) == 0)
+    {
+        Logger::error("CAN socket is not ready for reading");
+        return false;
+    }
+
     const ssize_t bytesRead = read(
         socketFd_,
         &frame,
