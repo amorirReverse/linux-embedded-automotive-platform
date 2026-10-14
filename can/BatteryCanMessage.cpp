@@ -3,6 +3,7 @@
 #include "BatteryCanMessage.hpp"
 
 #include <cstring>
+#include <cmath>
 
 bool BatteryCanMessage::encode(
     double voltage,
@@ -10,7 +11,16 @@ bool BatteryCanMessage::encode(
     double stateOfCharge,
     uint8_t *data)
 {
-    if (data == nullptr)
+    if (data == nullptr ||
+        !std::isfinite(voltage) ||
+        !std::isfinite(current) ||
+        !std::isfinite(stateOfCharge) ||
+        voltage < 0.0 ||
+        current < 0.0 ||
+        stateOfCharge < 0.0 ||
+        stateOfCharge > 100.0 ||
+        voltage > 655.35 ||
+        current > 655.35)
     {
         return false;
     }

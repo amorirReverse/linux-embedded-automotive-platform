@@ -69,3 +69,17 @@ add_subdirectory(can)
 add_subdirectory(ecu/engine)
 add_subdirectory(ecu/battery)
 add_subdirectory(apps/gateway)
+
+install(TARGETS engine_ecu battery_ecu gateway
+    RUNTIME DESTINATION bin
+)
+
+install(TARGETS common can
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
+
+install(
+    FILES config/platform.conf
+    DESTINATION /etc/linux-embedded-automotive
+)

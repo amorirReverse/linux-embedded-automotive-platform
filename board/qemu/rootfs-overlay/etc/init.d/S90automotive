@@ -1,0 +1,27 @@
+#!/bin/sh
+
+case "$1" in
+    start)
+        echo "Starting automotive applications..."
+
+        /usr/bin/engine_ecu > /tmp/engine.log 2>&1 &
+        /usr/bin/battery_ecu > /tmp/battery.log 2>&1 &
+        /usr/bin/gateway > /tmp/gateway.log 2>&1 &
+
+        ;;
+    stop)
+        kill "$(pidof engine_ecu)" 2>/dev/null
+        kill "$(pidof battery_ecu)" 2>/dev/null
+        kill "$(pidof gateway)" 2>/dev/null
+        ;;
+    restart)
+        "$0" stop
+        "$0" start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit 0
