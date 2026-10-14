@@ -8,9 +8,11 @@ The project focuses on embedded software architecture, Linux system programming,
 
 ## 🚧 Project Status
 
-**Current milestone:** V0.3 — Multi-ECU Platform
+**Current milestone:** Multi-ECU Platform — Reliability and Deployment Validation
 
-The project is under active development.
+**Status:** In progress
+
+The platform supports a standalone CMake build and a Buildroot/QEMU integration for running multiple automotive applications on embedded Linux.
 
 ### V0.1 — Initial ECU Simulation
 
@@ -37,24 +39,29 @@ The project is under active development.
 
 * [x] Battery ECU model
 * [x] Shared logging component
-* [x] Engine CAN message unit tests
-* [x] Battery CAN message unit tests
+* [x] Engine and Battery CAN message unit tests
 * [x] Engine model unit tests
+* [x] Configuration file parsing and validation
+* [x] Configuration unit tests
 * [x] CTest integration
-* [x] Platform startup script
-* [ ] Improved error handling
+* [x] Error reporting across CAN communication and ECU applications
+* [x] Detection and logging of ECU cycles exceeding the configured timeout
+* [x] Buildroot external tree and QEMU integration
+* [x] Automatic ECU startup in the Buildroot image
+* [ ] Review and improve error recovery
 * [ ] Multithreaded ECU execution
-* [ ] Configuration management
-* [ ] Watchdog supervision
+* [ ] Validate systemd service behavior at runtime
+* [ ] Independent watchdog supervision
+
 
 ### Future Work
-
-* [ ] systemd service integration
 * [ ] Continuous integration
 * [ ] Doxygen documentation generation
-* [ ] Fault and error simulation
+* [ ] Fault injection and error simulation
 * [ ] Yocto-based embedded Linux image
-* [ ] Embedded Linux deployment
+* [ ] Further embedded Linux deployment and validation
+
+V0.3 remains under development. A stable release will be tagged after the milestone's remaining tasks and validation are complete.
 
 ---
 
@@ -100,53 +107,31 @@ The architecture is progressively evolving toward a more complete embedded autom
 
 ```text
 linux-embedded-automotive-platform/
-
 ├── apps/
-│   └── gateway/
-│       ├── Gateway.*
-│       ├── main.cpp
-│       └── CMakeLists.txt
-│
-├── can/
-│   ├── CanSocket.*
-│   ├── EngineCanMessage.*
-│   ├── BatteryCanMessage.*
-│   ├── test_can.cpp
-│   └── CMakeLists.txt
-│
-├── common/
-│   ├── Logger.*
-│   └── CMakeLists.txt
-│
-├── docs/
-│
+│   └── gateway/                 # CAN gateway application
+├── board/
+│   └── qemu/
+│       └── rootfs-overlay/      # Buildroot root filesystem overlay
+├── buildroot-external/          # Buildroot external tree and package
+├── can/                         # SocketCAN abstraction and CAN messages
+├── common/                      # Shared logger and configuration parser
+├── config/
+│   └── platform.conf            # Platform configuration
+├── deploy/
+│   └── systemd/                 # systemd service unit files
 ├── ecu/
-│   ├── engine/
-│   │   ├── Engine.*
-│   │   ├── EngineEcu.*
-│   │   ├── main.cpp
-│   │   └── CMakeLists.txt
-│   │
-│   ├── battery/
-│   │   ├── Battery.*
-│   │   ├── BatteryEcu.*
-│   │   ├── main.cpp
-│   │   └── CMakeLists.txt
-│   │
-│   └── abs/
-│
+│   ├── engine/                  # Engine model and ECU
+│   ├── battery/                 # Battery model and ECU
+│   └── abs/                     # Reserved for future ABS development
 ├── scripts/
-│   └── run_platform.sh
-│
-├── tests/
-│   ├── test_engine.cpp
-│   ├── test_engine_can_message.cpp
-│   ├── test_battery_can_message.cpp
-│   └── test_logger.cpp
-│
+│   ├── install_platform.sh
+│   ├── run_platform.sh
+│   └── setup_vcan0.sh
+├── tests/                       # Unit and ECU tests
 ├── CMakeLists.txt
 └── README.md
 ```
+The project also includes component-level CMake files and tests in the relevant source directories.
 
 ---
 
@@ -221,6 +206,43 @@ The complete platform can be started with:
 
 The startup script launches the Gateway, Engine ECU, and Battery ECU together.
 
+### Buildroot / QEMU
+The repository includes a Buildroot external tree and a QEMU root filesystem overlay.
+
+The overlay provides two SysV init scripts:
+
+* `S40vcan` creates and enables the vcan0 virtual CAN interface.
+* `S90automotive` starts the Engine ECU, Battery ECU, and Gateway at boot.
+
+The Buildroot package is defined in
+`buildroot-external/package/linux-embedded-automotive-platform/`.
+
+#### Runtime verification
+After booting the Buildroot image in QEMU, verify the CAN interface:
+```bash
+ip link show vcan0
+```
+
+Check that the three applications are running:
+```bash
+ps
+```
+
+Inspect the application logs:
+```bash
+cat /tmp/engine.log
+cat /tmp/battery.log
+cat /tmp/gateway.log
+```
+
+If `candump` is available in the image, monitor CAN traffic with:
+```bash
+candump vcan0
+```
+
+**Reproducibility note:** The repository contains the Buildroot external tree and root filesystem overlay, but does not yet include the Buildroot configuration, image-generation commands, or QEMU launch script needed to reproduce the complete workflow from a clean checkout.
+
+
 ---
 
 ## 🔌 CAN Communication
@@ -266,32 +288,27 @@ The Gateway receives and decodes both message types.
 
 The project uses standalone test executables integrated with **CTest**.
 
-Run the complete test suite with:
+Build the project and run the complete test suite with:
 
 ```bash
-ctest --test-dir build
+cmake -S . -B build
+cmake --build build -j
+ctest --test-dir build --output-on-failure
 ```
 
-Current tests cover:
+The test suite currently contains 10 tests covering:
+* Logger and configuration handling
+* CAN socket operations
+* Engine and Battery CAN message encoding and decoding
+* Engine and Battery model behavior
+* Engine and Battery ECU behavior
+* Gateway behavior
 
-* Engine CAN message encoding and decoding
-* Battery CAN message encoding and decoding
-* Engine model behavior
-* Shared Logger component
-
-Example:
-
-```text
-Test project .../build
-    Start 1: logger_test
-    Start 2: engine_can_message_test
-    Start 3: battery_can_message_test
-    Start 4: engine_test
-
-100% tests passed
+To list the registered tests without executing them:
+```bash
+ctest --test-dir build --show-only
 ```
 
-Individual tests can also be executed directly from the build directory.
 
 ---
 
@@ -331,12 +348,6 @@ The long-term goal is to build a small but realistic embedded platform that can 
 
 ## 📌 Versioning
 
-The project uses Git tags to mark stable milestones.
+Git tags mark project milestones. Available tags include `v0.1.0`, `v0.2.0`, `v0.3.0`, and `v0.4.0`.
 
-Current stable release:
-
-**v0.2.0 — CAN communication**
-
-Development continues on the `main` branch toward **V0.3**.
-
-A new release tag will be created once the V0.3 milestone is complete.
+Development and integration work continues on the `main` branch. Refer to the corresponding Git tag to inspect a specific milestone.
