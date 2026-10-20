@@ -31,7 +31,9 @@ int main()
     uint8_t data[8]{};
     uint8_t dataLength = 0;
 
-    if (!receiver.receive(canId, data, dataLength, sizeof(data)))
+    CanSocket::ReceiveError error = CanSocket::ReceiveError::NONE;
+
+    if (!receiver.receive(canId, data, dataLength, sizeof(data), error))
     {
         std::cerr << "Failed to receive CAN message" << std::endl;
         return 1;

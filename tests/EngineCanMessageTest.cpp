@@ -74,7 +74,6 @@ bool testEncodeDecode(
  */
 int main()
 {
-    uint8_t data[EngineCanMessage::PAYLOAD_LENGTH]{};
     double rpm = 0.0;
     double temperature = 0.0;
 

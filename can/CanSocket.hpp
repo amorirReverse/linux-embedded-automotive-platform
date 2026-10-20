@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <string>
 #include <poll.h>
+#include <sys/types.h>
+#include <functional>
 
 /**
  * @brief Provides access to a Linux SocketCAN interface.
@@ -15,12 +17,48 @@
 class CanSocket
 {
 public:
+    enum class ReceiveError
+    {
+        NONE,             // no error
+        RECEIVE_TIMEOUT,  // no data received within the time limit
+        SYSTEM_ERROR,     // system failure
+        BUFFER_TOO_SMALL, // destination buffer too small
+        INVALID_ARGUMENT, // invalid parameters or initial state;
+        INVALID_FRAME,    // incomplete frame or invalid payload length
+    };
+
     /**
      * @brief Creates a CAN socket.
      *
      * @param interfaceName Linux CAN interface name, for example "vcan0".
      */
     explicit CanSocket(const std::string &interfaceName);
+
+    using WriteFunction =
+        std::function<ssize_t(int, const void *, size_t)>;
+
+    using PollFunction =
+        std::function<int(struct pollfd *, nfds_t, int)>;
+
+    using ReadFunction =
+        std::function<ssize_t(int, void *, size_t)>;
+
+    /**
+     * @brief Creates a CAN socket with a custom write function.
+     *
+     * @param socketFd The file descriptor of the CAN socket.
+     * @param writeFunction The function to use for writing to the socket.
+     * @param pollFunction The function to use for polling the socket.
+     * @param readFunction The function to use for reading from the socket.
+     */
+    CanSocket(
+        int socketFd,
+        WriteFunction writeFunction,
+        PollFunction pollFunction,
+        ReadFunction readFunction);
+
+    CanSocket(const CanSocket &) = delete;
+    CanSocket &operator=(const CanSocket &) = delete;
 
     /**
      * @brief Destroys the CAN socket.
@@ -46,6 +84,8 @@ public:
      * @param dataLength Output payload length.
      * @param dataCapacity Maximun writable payload size.
      * @param timeoutMs Maximum wait time in milliseconds.
+     * @param error Output error code.
+     *
      * @return True if a frame was received successfully, false on timeout or error.
      */
     bool receive(
@@ -53,7 +93,8 @@ public:
         uint8_t *data,
         uint8_t &dataLength,
         uint8_t dataCapacity,
-        int timeoutMs);
+        int timeoutMs,
+        ReceiveError &error);
 
     /**
      * @brief Receives a CAN data frame.
@@ -67,6 +108,7 @@ public:
      * @param data Output buffer receiving the payload data.
      * @param dataLength Output number of payload bytes.
      * @param dataCapacity Maximum number of bytes that can be written to the data buffer.
+     * @param error Output error code.
      *
      * @return True if the frame was received and copied successfully,
      *         false otherwise.
@@ -75,15 +117,20 @@ public:
         uint32_t &canId,
         uint8_t *data,
         uint8_t &dataLength,
-        uint8_t dataCapacity);
+        uint8_t dataCapacity,
+        ReceiveError &error);
 
     /**
      * @brief Checks whether the CAN socket is valid.
      *
      * @return True if the socket is ready for communication, false otherwise.
      */
-    bool isValid() const;
+    [[nodiscard]] bool isValid() const;
 
 private:
     int socketFd_;
+    bool ownsSocket_;
+    WriteFunction writeFunction_;
+    PollFunction pollFunction_;
+    ReadFunction readFunction_;
 };

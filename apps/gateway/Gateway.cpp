@@ -33,12 +33,15 @@ void Gateway::processFrame()
     uint8_t data[8]{};
     uint8_t dataLength = 0;
 
+    CanSocket::ReceiveError error = CanSocket::ReceiveError::NONE;
+
     const bool frameReceived = canSocket_.receive(
         canId,
         data,
         dataLength,
         sizeof(data),
-        100);
+        100,
+        error);
 
     if (!frameReceived)
     {

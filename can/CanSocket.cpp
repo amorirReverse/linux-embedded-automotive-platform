@@ -15,9 +15,26 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <poll.h>
+#include <utility>
 
 CanSocket::CanSocket(const std::string &interfaceName)
-    : socketFd_(-1)
+    : socketFd_(-1),
+      ownsSocket_(true),
+      writeFunction_(
+          [](int fd, const void *buf, size_t size)
+          {
+              return write(fd, buf, size);
+          }),
+      pollFunction_(
+          [](struct pollfd *fds, nfds_t nfds, int timeoutMs)
+          {
+              return poll(fds, nfds, timeoutMs);
+          }),
+      readFunction_(
+          [](int fd, void *buf, size_t size)
+          {
+              return read(fd, buf, size);
+          })
 {
     socketFd_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 
@@ -70,10 +87,23 @@ bool CanSocket::isValid() const
 
 CanSocket::~CanSocket()
 {
-    if (socketFd_ >= 0)
+    if (ownsSocket_ && socketFd_ >= 0)
     {
         close(socketFd_);
     }
+}
+
+CanSocket::CanSocket(int socketFd,
+                     WriteFunction writeFunction,
+                     PollFunction pollFunction,
+                     ReadFunction readFunction)
+    : socketFd_(socketFd),
+      ownsSocket_(false),
+
+      writeFunction_(std::move(writeFunction)),
+      pollFunction_(std::move(pollFunction)),
+      readFunction_(std::move(readFunction))
+{
 }
 
 bool CanSocket::send(
@@ -81,7 +111,7 @@ bool CanSocket::send(
     const uint8_t *data,
     uint8_t dataLength)
 {
-    if (socketFd_ < 0 || data == nullptr || dataLength > CAN_MAX_DLEN)
+    if (socketFd_ < 0 || !writeFunction_ || data == nullptr || dataLength > CAN_MAX_DLEN)
     {
         return false;
     }
@@ -93,16 +123,27 @@ bool CanSocket::send(
 
     std::memcpy(frame.data, data, dataLength);
 
-    const ssize_t bytesSent = write(
-        socketFd_,
-        &frame,
-        sizeof(frame));
+    ssize_t bytesSent;
+    do
+    {
+        bytesSent = writeFunction_(
+            socketFd_,
+            &frame,
+            sizeof(frame));
+    } while (bytesSent < 0 && errno == EINTR);
 
-    if (bytesSent != sizeof(frame))
+    if (bytesSent < 0)
     {
         Logger::error(
             "Failed to send CAN frame: " +
             std::string(std::strerror(errno)));
+
+        return false;
+    }
+
+    if (bytesSent != sizeof(frame))
+    {
+        Logger::error("Incomplete CAN frame write");
 
         return false;
     }
@@ -114,14 +155,16 @@ bool CanSocket::receive(
     uint32_t &canId,
     uint8_t *data,
     uint8_t &dataLength,
-    uint8_t dataCapacity)
+    uint8_t dataCapacity,
+    ReceiveError &error)
 {
     return receive(
         canId,
         data,
         dataLength,
         dataCapacity,
-        -1);
+        -1,
+        error);
 }
 
 bool CanSocket::receive(
@@ -129,10 +172,21 @@ bool CanSocket::receive(
     uint8_t *data,
     uint8_t &dataLength,
     uint8_t dataCapacity,
-    int timeoutMs)
+    int timeoutMs,
+    ReceiveError &error)
 {
-    if (socketFd_ < 0 || data == nullptr)
+    error = ReceiveError::NONE;
+    dataLength = 0;
+
+    if (socketFd_ < 0 || !readFunction_ || !pollFunction_ || data == nullptr)
     {
+        error = ReceiveError::INVALID_ARGUMENT;
+        return false;
+    }
+
+    if (timeoutMs < -1)
+    {
+        error = ReceiveError::INVALID_ARGUMENT;
         return false;
     }
 
@@ -141,51 +195,77 @@ bool CanSocket::receive(
     descriptor.fd = socketFd_;
     descriptor.events = POLLIN;
 
-    const int pollResult = poll(&descriptor, 1, timeoutMs);
+    int pollResult;
+
+    do
+    {
+        descriptor.revents = 0;
+        pollResult = pollFunction_(&descriptor, 1, timeoutMs);
+    } while (pollResult < 0 && errno == EINTR);
 
     if (pollResult == 0)
     {
+        error = ReceiveError::RECEIVE_TIMEOUT;
         return false;
     }
 
     if (pollResult < 0)
     {
-        if (errno == EINTR)
-        {
-            return false;
-        }
+        Logger::error("CAN socket poll failed" +
+                      std::string(std::strerror(errno)));
+        error = ReceiveError::SYSTEM_ERROR;
+        return false;
+    }
 
-        Logger::error("CAN socket poll failed");
+    if ((descriptor.revents & (POLLERR | POLLHUP | POLLNVAL)) != 0)
+    {
+        Logger::error("CAN socket poll reported an error event: " +
+                      std::to_string(descriptor.revents));
+        error = ReceiveError::SYSTEM_ERROR;
         return false;
     }
 
     if ((descriptor.revents & POLLIN) == 0)
     {
-        Logger::error("CAN socket is not ready for reading");
+        Logger::warning("CAN socket has no readable data");
+        error = ReceiveError::SYSTEM_ERROR;
         return false;
     }
 
-    const ssize_t bytesRead = read(
-        socketFd_,
-        &frame,
-        sizeof(frame));
+    ssize_t bytesRead;
+
+    do
+    {
+        bytesRead = readFunction_(
+            socketFd_,
+            &frame,
+            sizeof(frame));
+    } while (bytesRead < 0 && errno == EINTR);
+
+    if (bytesRead < 0)
+    {
+        error = ReceiveError::SYSTEM_ERROR;
+        return false;
+    }
 
     if (bytesRead != sizeof(frame))
     {
-        Logger::error(
-            "Failed to read CAN frame: " +
-            std::string(std::strerror(errno)));
-
+        error = ReceiveError::INVALID_FRAME;
         return false;
     }
 
     if (frame.len > CAN_MAX_DLEN)
     {
+        Logger::error("Received CAN frame has an invalid payload length");
+        error = ReceiveError::INVALID_FRAME;
         return false;
     }
 
     if (dataCapacity < frame.len)
     {
+        Logger::warning("CAN receive buffer is too small for the frame");
+        error = ReceiveError::BUFFER_TOO_SMALL;
+        dataLength = frame.len;
         return false;
     }
 
