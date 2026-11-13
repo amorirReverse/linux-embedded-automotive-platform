@@ -12,7 +12,6 @@ namespace
 {
     constexpr int DEFAULT_SIMULATION_PERIOD_MS = 100;
 
-
     /**
      * @brief Removes leading and trailing whitespace from a string.
      *
@@ -88,11 +87,17 @@ Configuration::Configuration(const std::string &configPath)
         {
             try
             {
-                const int simulationPeriodMs = std::stoi(value);
+                std::size_t parsedChars = 0;
+                const int simulationPeriodMs = std::stoi(value, &parsedChars);
 
-                if (simulationPeriodMs > 0)
+                if (parsedChars != value.size() || simulationPeriodMs <= 0)
                 {
-                    simulationPeriodMs_ = simulationPeriodMs;
+                    Logger::warning(
+                        "simulation_period_ms must be a positive integer at line " +
+                        std::to_string(lineNumber) +
+                        ": " +
+                        value);
+                    simulationPeriodMs_ = DEFAULT_SIMULATION_PERIOD_MS;
                 }
                 else
                 {
